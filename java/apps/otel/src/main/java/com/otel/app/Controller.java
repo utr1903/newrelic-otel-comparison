@@ -47,10 +47,10 @@ public class Controller {
 		try {
 			logger.info("Main method is triggered...");
 			childMethod();
-			return new ResponseEntity<String>("", HttpStatus.OK);
+			return new ResponseEntity<String>("Done.", HttpStatus.OK);
 		} catch (Exception e) {
 			Span.current().recordException(e);
-			return new ResponseEntity<String>("", HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>("Done.", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
