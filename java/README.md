@@ -60,6 +60,67 @@ FROM Metric SELECT average(invocations) WHERE service.name = 'comparison-java-ot
 ```
 
 See your logs
+
 ```
 FROM Log SELECT * WHERE service.name = 'comparison-java-otel'
+```
+
+## New Relic
+
+### Run the app
+
+Get into the directory of the otel app:
+
+```shell
+cd ./java/newrelic
+```
+
+Download the OpenTelemetry auto-instrumentation JAR file:
+
+```shell
+wget https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.8.0/newrelic-agent-8.8.0.jar
+```
+
+Build the code with:
+
+```shell
+mvn -f pom.xml clean package
+```
+
+Run the code with:
+
+```shell
+export NEW_RELIC_APP_NAME=comparison-java-newrelic; export NEW_RELIC_LICENSE_KEY=<License key>; java -javaagent:./newrelic-agent-8.8.0.jar -jar ./target/app-0.0.1.jar
+```
+
+Generate traffic:
+
+```shell
+while true; do curl http://localhost:8080/api; sleep 1; done
+```
+
+### Monitor in New Relic
+
+See your transactions:
+
+```
+FROM Transaction SELECT * WHERE appName = 'comparison-java-newrelic'
+```
+
+See your spans:
+
+```
+FROM Span SELECT * WHERE appName = 'comparison-java-newrelic'
+```
+
+See your custom events:
+
+```
+FROM MyCustomEvent SELECT * WHERE appName = 'comparison-java-newrelic'
+```
+
+See your logs
+
+```
+FROM Log SELECT * WHERE entity.name = 'comparison-java-newrelic'
 ```
