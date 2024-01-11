@@ -22,7 +22,7 @@ import io.opentelemetry.context.Scope;
 @RequestMapping()
 public class Controller {
 
-	private static final String SPAN_EVENT = "MySpanEvent";
+	private static final String CUSTOM_EVENT = "MyCustomEvent";
 
 	private static final Logger logger = LogManager.getLogger(Controller.class);
 
@@ -67,7 +67,7 @@ public class Controller {
 				invocations.add(1, Attributes.of(AttributeKey.booleanKey("succeded"), false));
 
 				Attributes attrs = Attributes.of(AttributeKey.stringKey("mykey"), "myvalue");
-				childSpan.addEvent(SPAN_EVENT, attrs);
+				childSpan.addEvent(CUSTOM_EVENT, attrs);
 
 				throw new Exception("MyException");
 			}
