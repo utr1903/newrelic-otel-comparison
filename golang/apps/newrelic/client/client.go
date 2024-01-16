@@ -38,7 +38,7 @@ func (c *Client) request() {
 	time.Sleep(time.Duration(time.Second))
 
 	// Start parent transaction
-	txn := c.app.StartTransaction("client")
+	txn := c.app.StartTransaction("call-to-otel-app")
 	defer txn.End()
 
 	// Prepare external request
