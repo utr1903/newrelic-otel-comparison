@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
 )
 
 type Client struct {
@@ -39,17 +40,26 @@ func (c *Client) request() {
 	// Make request every second
 	time.Sleep(time.Duration(time.Second))
 
-	// // Create span
-	// ctx, span := otel.Tracer("client").Start(ctx, "say hello")
-	// defer span.End()
+	// Create parent span
+	ctx, span := otel.Tracer("client").Start(ctx, "call-to-newrelic-app")
+	defer span.End()
 
-	// Prepare request with span context
-	req, _ := http.NewRequestWithContext(ctx, "GET", "http://localhost:8081/api", nil)
+	// Prepare request with span context -> creates client span
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8081/api", nil)
+	if err != nil {
+		// Record error
+		span.RecordError(err)
+		fmt.Println(err)
+		return
+	}
 
 	// Perform HTTP request
 	res, err := c.client.Do(req)
 	if err != nil {
+		// Record error
+		span.RecordError(err)
 		fmt.Println(err)
+		return
 	}
 
 	io.ReadAll(res.Body)
