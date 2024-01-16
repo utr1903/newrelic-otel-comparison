@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/utr1903/newrelic-otel-comparison/golang/apps/otel/client"
 	"github.com/utr1903/newrelic-otel-comparison/golang/apps/otel/otel"
 	"github.com/utr1903/newrelic-otel-comparison/golang/apps/otel/server"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -30,9 +31,13 @@ func main() {
 		panic(err)
 	}
 
+	// Instantiate & run client
+	c := client.New()
+	go c.Simulate()
+
 	// Instantiate server
-	srv := server.New()
-	http.Handle("/api", otelhttp.NewHandler(http.HandlerFunc(srv.Handler), "api"))
+	s := server.New()
+	http.Handle("/api", otelhttp.NewHandler(http.HandlerFunc(s.Handler), "api"))
 
 	// Start server
 	err = http.ListenAndServe(":8080", nil)
