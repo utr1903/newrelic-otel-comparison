@@ -83,6 +83,12 @@ See your transactions:
 FROM Transaction SELECT * WHERE appName = 'comparison-golang-newrelic'
 ```
 
+See your transactions with errors:
+
+```
+FROM TransactionError SELECT * WHERE appName = 'comparison-golang-newrelic'
+```
+
 See your spans:
 
 ```
@@ -92,11 +98,5 @@ FROM Span SELECT * WHERE appName = 'comparison-golang-newrelic'
 See your custom events:
 
 ```
-FROM MyCustomEvent SELECT * WHERE appName = 'comparison-golang-newrelic'
-```
-
-See your logs
-
-```
-FROM Log SELECT * WHERE entity.name = 'comparison-golang-newrelic'
+FROM MyCustomEvent SELECT *'
 ```

@@ -35,7 +35,7 @@ func main() {
 	go c.Simulate()
 
 	// Instantiate server
-	s := server.New()
+	s := server.New(app)
 	http.HandleFunc(newrelic.WrapHandleFunc(app, "/api", s.Handler))
 
 	// Start server
