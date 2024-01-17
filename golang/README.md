@@ -35,16 +35,22 @@ See your spans:
 FROM Span SELECT * WHERE service.name = 'comparison-golang-otel'
 ```
 
-See your span events:
+See your exceptions:
 
 ```
-FROM SpanEvent SELECT * WHERE service.name = 'comparison-golang-otel'
+FROM SpanEvent SELECT * WHERE trace.id IN (FROM Span SELECT uniques(trace.id) WHERE service.name = 'comparison-golang-otel' AND otel.status_code = 'ERROR')
+```
+
+See your all possible metrics:
+
+```
+FROM Metric SELECT uniques(metricName) WHERE service.name = 'comparison-golang-otel' LIMIT MAX
 ```
 
 See your custom metric:
 
 ```
-FROM Metric SELECT average(invocations) WHERE service.name = 'comparison-golang-otel' TIMESERIES
+FROM Metric SELECT sum(invocations) WHERE service.name = 'comparison-golang-otel' FACET succeeded
 ```
 
 ## New Relic
