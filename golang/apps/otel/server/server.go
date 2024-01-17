@@ -1,14 +1,42 @@
 package server
 
 import (
+	"errors"
+	"math/rand"
 	"net/http"
+	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Server struct {
+	randomizer  *rand.Rand
+	invocations metric.Int64Counter
 }
 
 func New() *Server {
-	return &Server{}
+
+	// Instantiate randomizer
+	randomizer := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	// Create custom metric
+	invocations, err := otel.GetMeterProvider().Meter("server").
+		Int64Counter(
+			"invocations",
+			metric.WithDescription("Measures the number of method invocations."),
+		)
+	if err != nil {
+		panic(err)
+	}
+
+	return &Server{
+		randomizer:  randomizer,
+		invocations: invocations,
+	}
 }
 
 // Server handler
@@ -16,7 +44,29 @@ func (s *Server) Handler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	s.createHttpResponse(w, http.StatusOK, []byte("OK"))
+
+	if s.randomizer.Intn(15) == 1 {
+		// Increment to counter
+		s.invocations.Add(r.Context(), 1,
+			metric.WithAttributes(attribute.Bool("succeeded", false)))
+
+		// Record error
+		span := trace.SpanFromContext(r.Context())
+		if span.IsRecording() {
+			span.SetStatus(codes.Error, "failed")
+			span.RecordError(errors.New("failed"))
+		}
+
+		// Set response
+		s.createHttpResponse(w, http.StatusInternalServerError, []byte("NOT OK"))
+	} else {
+		// Increment to counter
+		s.invocations.Add(r.Context(), 1,
+			metric.WithAttributes(attribute.Bool("succeeded", true)))
+
+		// Set response
+		s.createHttpResponse(w, http.StatusOK, []byte("OK"))
+	}
 }
 
 func (s *Server) createHttpResponse(
