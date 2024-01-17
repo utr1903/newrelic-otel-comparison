@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/utr1903/newrelic-otel-comparison/golang/apps/newrelic/client"
 	"github.com/utr1903/newrelic-otel-comparison/golang/apps/newrelic/server"
 )
 
