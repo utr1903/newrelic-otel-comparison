@@ -50,11 +50,24 @@ func (s *Server) Handler(
 		s.invocations.Add(r.Context(), 1,
 			metric.WithAttributes(attribute.Bool("succeeded", false)))
 
-		// Record error
+		// Get span from context
 		span := trace.SpanFromContext(r.Context())
 		if span.IsRecording() {
+			// Set OTel status code & description
 			span.SetStatus(codes.Error, "failed")
+
+			// Record exception
 			span.RecordError(errors.New("failed"))
+
+			// Record custom event
+			span.AddEvent(
+				"MyCustomEvent",
+				trace.EventOption(
+					trace.WithAttributes(
+						attribute.String("mykey", "myvalue"),
+					),
+				),
+			)
 		}
 
 		// Set response
