@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/utr1903/newrelic-otel-comparison/golang/apps/newrelic/client"
 	"github.com/utr1903/newrelic-otel-comparison/golang/apps/newrelic/server"
 )
 
@@ -17,6 +17,13 @@ func main() {
 		newrelic.ConfigAppLogForwardingEnabled(false),
 		newrelic.ConfigCodeLevelMetricsEnabled(false),
 	)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// Wait for successfull handshake
+	err = app.WaitForConnection(5 * time.Second)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
